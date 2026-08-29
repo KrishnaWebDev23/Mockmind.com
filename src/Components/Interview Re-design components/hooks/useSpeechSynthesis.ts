@@ -5,67 +5,57 @@ type UseSpeechSynthesisProps = {
   text?: string;
   videoRef: RefObject<HTMLVideoElement | null>;
   onSpeechComplete?: () => void;
-  loading: boolean
+  loading: boolean;
 };
 
 export const useSpeechSynthesis = ({
   text,
   videoRef,
   onSpeechComplete,
-  loading
+  loading,
 }: UseSpeechSynthesisProps) => {
-  const selectedVoiceRef =
-    useRef<SpeechSynthesisVoice | null>(null);
+  const selectedVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
-  const utteranceRef =
-    useRef<SpeechSynthesisUtterance | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   const speechIdRef = useRef(0);
 
-  const [speechPosition, setSpeechPosition] =
-    useState<number | undefined>(undefined);
+  const [speechPosition, setSpeechPosition] = useState<number | undefined>(
+    undefined,
+  );
 
-  const [speechComplete, setSpeechComplete] =
-    useState(false);
+  const [speechComplete, setSpeechComplete] = useState(false);
 
   /*
    * Load available browser voices.
    */
   useEffect(() => {
     const loadVoices = () => {
-      const voices =
-        window.speechSynthesis.getVoices();
+      const voices = window.speechSynthesis.getVoices();
 
-      const preferredVoice = voices.find(
-        (voice) => {
-          const name = voice.name.toLowerCase();
+      const preferredVoice = voices.find((voice) => {
+        const name = voice.name.toLowerCase();
 
-          return (
-            name.includes("male") ||
-            name.includes("david") ||
-            name.includes("mark") ||
-            name.includes("alex") ||
-            name.includes("daniel")
-          );
-        },
-      );
+        if (name.includes("female")) return false;
 
-      selectedVoiceRef.current =
-        preferredVoice ?? voices[0] ?? null;
+        return (
+          name.includes("male") ||
+          name.includes("david") ||
+          name.includes("mark") ||
+          name.includes("alex") ||
+          name.includes("daniel")
+        );
+      });
+
+      selectedVoiceRef.current = preferredVoice ?? voices[0] ?? null;
     };
 
     loadVoices();
 
-    window.speechSynthesis.addEventListener(
-      "voiceschanged",
-      loadVoices,
-    );
+    window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
 
     return () => {
-      window.speechSynthesis.removeEventListener(
-        "voiceschanged",
-        loadVoices,
-      );
+      window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
 
       window.speechSynthesis.cancel();
     };
@@ -75,8 +65,7 @@ export const useSpeechSynthesis = ({
    * Speak whenever the requested text changes.
    */
   useEffect(() => {
-
-    if(loading) return
+    if (loading) return;
 
     if (!text?.trim()) {
       return;
@@ -89,16 +78,15 @@ export const useSpeechSynthesis = ({
      */
     window.speechSynthesis.cancel();
 
-    const utterance =
-      new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(text);
 
     utteranceRef.current = utterance;
 
     if (selectedVoiceRef.current) {
-      utterance.voice =
-        selectedVoiceRef.current;
+      utterance.voice = selectedVoiceRef.current;
     }
-
+    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    utterance.rate = isMobile ? 0.85 : 1;
     utterance.rate = 1;
     utterance.pitch = 1;
     utterance.lang = "en-US";
@@ -122,9 +110,7 @@ export const useSpeechSynthesis = ({
         return;
       }
 
-      if (
-        typeof event.charIndex === "number"
-      ) {
+      if (typeof event.charIndex === "number") {
         setSpeechPosition(event.charIndex);
       }
     };
@@ -161,22 +147,15 @@ export const useSpeechSynthesis = ({
       onSpeechComplete?.();
     };
 
-    window.speechSynthesis.speak(
-      utterance,
-    );
+    window.speechSynthesis.speak(utterance);
 
     /*
      * When text changes, invalidate this utterance.
      */
-   return () => {
-  window.speechSynthesis.cancel();
-};
-  }, [
-    text,
-    videoRef,
-    onSpeechComplete,
-    loading
-  ]);
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, [text, videoRef, onSpeechComplete, loading]);
 
   return {
     speechPosition,
