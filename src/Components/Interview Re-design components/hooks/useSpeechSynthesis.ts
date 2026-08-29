@@ -102,7 +102,7 @@ export const useSpeechSynthesis = ({
     }
     const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
     utterance.rate = isMobile ? 0.85 : 1;
-    utterance.rate = 1;
+    // utterance.rate = 1;
     utterance.pitch = 1;
     utterance.lang = "en-US";
 
