@@ -33,6 +33,11 @@ export const useSpeechSynthesis = ({
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();
 
+       // TEMP DEBUG - remove after
+  if (voices.length > 0) {
+    alert(voices.map((v) => v.name).join("\n"));
+  }
+
       const preferredVoice = voices.find((voice) => {
         const name = voice.name.toLowerCase();
 
@@ -46,9 +51,7 @@ export const useSpeechSynthesis = ({
           name.includes("daniel")
         );
       });
-      console.log(
-  voices.map((v) => `${v.name} | ${v.lang}`)
-);
+      
       selectedVoiceRef.current = preferredVoice ?? voices[0] ?? null;
     };
 
