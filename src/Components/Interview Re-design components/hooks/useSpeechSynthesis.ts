@@ -46,7 +46,9 @@ export const useSpeechSynthesis = ({
           name.includes("daniel")
         );
       });
-
+      console.log(
+  voices.map((v) => `${v.name} | ${v.lang}`)
+);
       selectedVoiceRef.current = preferredVoice ?? voices[0] ?? null;
     };
 
