@@ -1,4 +1,4 @@
-import photo from "../../assets/robot2.png"
+import photo from "../../assets/robot1.webp"
 import { motion } from 'framer-motion'
 
 const AIAvatar = () => {

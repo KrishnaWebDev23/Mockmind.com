@@ -1,3 +1,13 @@
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
 /* Dark scrollbar */
 ::-webkit-scrollbar {
   width: 10px;

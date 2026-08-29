@@ -142,7 +142,7 @@ const Sidebar = () => {
       </AnimatePresence>
 
       {/* Sidebar itself — desktop, always visible, no animation needed */}
-      <div className='hidden bg-black lg:flex w-76 h-screen flex-col border-r border-white/20'>
+      <div className='hidden shrink-0 bg-black lg:flex w-76 h-screen flex-col border-r border-white/20'>
           {/* Sidebar Logo */}
           <div className='flex justify-between items-center border-b border-white/20 px-5 py-4'>
              <h1 className="text-xl font-medium text-white">MockMind</h1>

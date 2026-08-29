@@ -306,7 +306,7 @@ const InterviewSetup = () => {
                       setSelected("");
                       reset();
                     }}
-                    className="text-black text-xs hover:text-zinc-700 border py-1 px-2 rounded-sm bg-white font-semibold cursor-pointer"
+                    className="text-black text-[9px] whitespace-nowrap sm:text-xs hover:text-zinc-700 border py-1 px-2 rounded-sm bg-white font-semibold cursor-pointer"
                   >
                     Change Resume
                   </button>

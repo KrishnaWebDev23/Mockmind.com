@@ -3,11 +3,14 @@ import InterviewSetup from './InterviewSetup'
 
 const InterviewSetupPanel = () => {
   return (
-    <div className='flex-1 flex flex-col lg:flex-row items-center lg:justify-center justify-start gap-8 lg:gap-5 px-4 sm:px-6 py-6 lg:py-0 overflow-y-auto lg:overflow-hidden min-w-0'>        
-    <WelcomeMessage />
-        <div className='w-full max-w-xl min-w-0 flex items-center justify-center'>
-          <InterviewSetup />
-        </div>
+    <div className="flex w-full flex-1 min-w-0 flex-col items-center justify-start gap-8 overflow-x-hidden px-4 py-15 sm:px-6 lg:flex-row lg:items-start lg:justify-center lg:gap-8 lg:py-10">
+      <div className="w-full min-w-0 max-w-2xl flex-1 lg:max-w-2xl">
+        <WelcomeMessage />
+      </div>
+
+      <div className="w-full max-w-xl min-w-0 shrink-0 lg:max-w-120">
+        <InterviewSetup />
+      </div>
     </div>
   )
 }
