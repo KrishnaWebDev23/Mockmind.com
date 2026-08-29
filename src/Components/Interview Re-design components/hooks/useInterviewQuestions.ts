@@ -105,7 +105,7 @@ export const useInterviewQuestions = () => {
       setLoading(true);
       setQuestionsError(false);
 
-      const data = await generateQuestions(config); 
+      const data = await generateQuestions({config, latestResult: latestResult ?? []}); 
 
       if (!data.valid) {
         showToast(data.reason, "error");
