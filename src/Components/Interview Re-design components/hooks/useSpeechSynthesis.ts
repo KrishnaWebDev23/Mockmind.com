@@ -30,7 +30,7 @@ export const useSpeechSynthesis = ({
    * Load available browser voices.
    */
   useEffect(() => {
-    const loadVoices = () => {
+  const loadVoices = () => {
   const voices = window.speechSynthesis.getVoices();
   if (voices.length === 0) return;
 
