@@ -31,29 +31,39 @@ export const useSpeechSynthesis = ({
    */
   useEffect(() => {
     const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) return;
 
-       // TEMP DEBUG - remove after
-  if (voices.length > 0) {
-    alert(voices.map((v) => v.name).join("\n"));
-  }
+  // Step 1: sirf English voices
+  const englishVoices = voices.filter((v) =>
+    v.lang.toLowerCase().startsWith("en")
+  );
 
-      const preferredVoice = voices.find((voice) => {
-        const name = voice.name.toLowerCase();
+  // Step 2: unme se male-sounding naam dhoondo (desktop ke liye kaam karega)
+  const maleVoice = englishVoices.find((voice) => {
+    const name = voice.name.toLowerCase();
+    if (name.includes("female")) return false;
+    return (
+      name.includes("male") ||
+      name.includes("david") ||
+      name.includes("mark") ||
+      name.includes("alex") ||
+      name.includes("daniel")
+    );
+  });
 
-        if (name.includes("female")) return false;
+  // Step 3: prefer en-US/en-IN agar gender match nahi mila (mobile case)
+  const preferredLangVoice = englishVoices.find(
+    (v) => v.lang === "en-US"
+  );
 
-        return (
-          name.includes("male") ||
-          name.includes("david") ||
-          name.includes("mark") ||
-          name.includes("alex") ||
-          name.includes("daniel")
-        );
-      });
-      
-      selectedVoiceRef.current = preferredVoice ?? voices[0] ?? null;
-    };
+  selectedVoiceRef.current =
+    maleVoice ??
+    preferredLangVoice ??
+    englishVoices[0] ??
+    voices[0] ??
+    null;
+};
 
     loadVoices();
 
