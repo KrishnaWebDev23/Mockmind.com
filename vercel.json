@@ -1,5 +1,11 @@
 {
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  ],
+
+   "env": {
+    "VITE_SUPABASE_URL": "https://vhtlcwtqywlwbarlbpzt.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "sb_publishable_sxlclzA4ajdwcLhfh93FqQ_u6_Kaxu3"
+  }
 }
+
