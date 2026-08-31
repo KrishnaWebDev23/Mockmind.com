@@ -74,7 +74,7 @@ const Sidebar = () => {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ duration: 0.3, ease: "easeOut" as const }}
-              className='w-72 sm:w-80 h-screen flex flex-col border-r border-white/20 bg-black fixed top-0 left-0 z-50 lg:hidden'
+              className='w-72 sm:w-80 h-dvh flex flex-col border-r border-white/20 bg-black fixed top-0 left-0 z-50 lg:hidden'
             >
               {/* Sidebar Logo */}
               <div className='flex justify-between items-center border-b border-white/20 px-5 py-4'>
@@ -119,7 +119,8 @@ const Sidebar = () => {
               </motion.div>
 
               {/* Logout */}
-              <div className='mt-auto text-white flex justify-between items-center px-5 py-3 border-t border-white/20'>
+              {/*  Sidebar ke bottom logout div mein */}
+              <div className='mt-auto text-white flex justify-between items-center px-5 py-3 border-t border-white/20 pb-[calc(0.75rem+env(safe-area-inset-bottom))]'>
                  <div className='flex items-center gap-2 min-w-0'>
                     <span className='shrink-0 bg-white text-black font-medium text-lg rounded-full w-10 h-10 flex items-center justify-center'>
                       {!user?.username ? '...' : user?.username?.[0].toUpperCase()}
@@ -142,7 +143,7 @@ const Sidebar = () => {
       </AnimatePresence>
 
       {/* Sidebar itself — desktop, always visible, no animation needed */}
-      <div className='hidden shrink-0 bg-black lg:flex w-76 h-screen flex-col border-r border-white/20'>
+      <div className='hidden shrink-0 bg-black lg:flex w-76 h-dvh flex-col border-r border-white/20'>
           {/* Sidebar Logo */}
           <div className='flex justify-between items-center border-b border-white/20 px-5 py-4'>
              <h1 className="text-xl font-medium text-white">MockMind</h1>
