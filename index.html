@@ -2,12 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mockmind</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+<!-- index.html mein <div id="root">...</div> ke andar -->
+  <div id="root">
+    <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;">
+      <span style="font-size:14px; opacity:0.6;">Loading...</span>
+    </div>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

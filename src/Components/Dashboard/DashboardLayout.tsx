@@ -1,7 +1,15 @@
+import { useEffect } from 'react';
 import Sidebar from './Sidebar';
 import { Outlet } from 'react-router-dom';
 
 const DashboardLayout = () => {
+  useEffect(() => {
+    document.body.classList.add('no-scroll');
+    return () => {
+      document.body.classList.remove('no-scroll');
+    };
+  }, []);
+
   return (
     <div className='h-screen flex bg-black overflow-hidden'>
        <Sidebar />
