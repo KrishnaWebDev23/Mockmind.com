@@ -10,7 +10,6 @@ export type InterviewPhase =
 
 export type InterviewTransition =
   | "intro"
-  | "next"
   | "complete"
   | null;
 

@@ -9,7 +9,7 @@ export const textToSpeech = async (textToSpeak: string): Promise<string> => {
   if (MOCK_MODE) return "";
 
   const ttsModel = genAI.getGenerativeModel({
-    model: "gemini-3.1-flash-tts-preview",
+    model: "gemini-2.5-flash-preview-tts", //gemini-3.1-flash-tts-preview //gemini-2.5-flash-preview-tts
   });
 
   const requestConfig = {
@@ -19,7 +19,7 @@ export const textToSpeech = async (textToSpeak: string): Promise<string> => {
       speechConfig: {
         voiceConfig: {
           prebuiltVoiceConfig: {
-            voiceName: "Kore",
+            voiceName: "Orus",
           },
         },
       },
@@ -33,6 +33,8 @@ export const textToSpeech = async (textToSpeak: string): Promise<string> => {
   if (!audioBase64) {
     throw new Error("Failed to generate audio stream from Gemini.");
   }
+
+  console.log("Error is here", audioBase64)
 
   return audioBase64;
 };

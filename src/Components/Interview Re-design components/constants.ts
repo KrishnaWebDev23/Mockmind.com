@@ -5,9 +5,6 @@ export const INTERVIEW_MESSAGES = {
   introTransition:
     "Thank you for introducing yourself. Let's start with your first question.",
 
-  nextQuestion:
-    "Thank you. Here is your next question.",
-
   complete:
     "Thank you for your time and for answering all the questions. That concludes your interview. Your responses are now being evaluated. Please wait a moment while we prepare your performance.",
 } as const;

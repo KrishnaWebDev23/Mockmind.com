@@ -5,8 +5,6 @@ import type { InterviewPhase } from "./types";
 
 type InterviewSidebarProps = {
   message: string | undefined;
-  speechPosition: number | undefined;
-  speechComplete: boolean;
   videoRef: RefObject<HTMLVideoElement | null>;
   questionIndex: number;
   totalQuestions: number;
@@ -16,8 +14,6 @@ type InterviewSidebarProps = {
 const InterviewSidebar = ({
   videoRef,
   message,
-  speechPosition,
-  speechComplete,
   questionIndex,
   totalQuestions,
   phase,
@@ -32,25 +28,7 @@ const InterviewSidebar = ({
 
   return (
     <section className="relative h-90 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#111] sm:h-107.5 lg:h-full   lg:min-w-0 lg:flex-1">
-      {/* <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_center,#252525_0%,#111_45%,#080808_100%)]">
-        <div className="relative">
-          <div className="absolute -inset-8 rounded-full bg-white/4 blur-3xl" />
-
-          
-          <div className="relative flex h-32 w-32 items-center justify-center rounded-full border border-white/10 bg-linear-to-br from-zinc-700 via-zinc-900 to-black shadow-2xl sm:h-40 sm:w-40">
-            <div className="text-center">
-              <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-white text-sm font-bold text-black sm:h-12 sm:w-12">
-                AI
-              </div>
-
-              <p className="text-xs font-medium">AI Interviewer</p>
-
-              <p className="mt-1 text-[10px] text-white/30">Listening</p>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
+     
       <div className="relative h-full w-full overflow-hidden rounded-xl">
         <video
           ref={videoRef}
@@ -58,7 +36,7 @@ const InterviewSidebar = ({
           loop
           muted
           playsInline
-          autoPlay
+
           className="absolute inset-0 h-full w-full object-cover"
         />
 
@@ -96,43 +74,49 @@ const InterviewSidebar = ({
       
 
       {/* AI Question */}
-      <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4">
-        <div className="rounded-xl border border-white/10 bg-black/60 p-3 backdrop-blur-xl sm:p-4">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white text-[9px] font-bold text-black">
-                AI
-              </div>
+<div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4">
+  <div className="rounded-xl border border-white/10 bg-black/60 p-3 backdrop-blur-xl sm:p-4">
+    <div className="mb-2 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white text-[9px] font-bold text-black">
+          AI
+        </div>
 
-              <div>
-                <p className="text-[12px] font-medium">AI Interviewer</p>
-                <p className="text-[10px] text-white/30">Do not refresh page during interview ⚠️</p>
-              </div>
-            </div>
-
-            {/* Audio */}
-            <div className="flex items-center gap-0.75">
-              <span className="h-2 w-0.5 animate-pulse bg-white/30" />
-              <span className="h-4 w-0.5 animate-pulse bg-white/60" />
-              <span className="h-2 w-0.5 animate-pulse bg-white/30" />
-              <span className="h-3 w-0.5 animate-pulse bg-white/50" />
-            </div>
-          </div>
-
-          <div className="rounded-xl px-4 shrink-0">
-            <InterviewerMessage
-              key={message}
-              text={message ?? ""}
-              speechPosition={speechPosition}
-              speechComplete={speechComplete}
-            />
-          </div>
-
-          {/* <div className="mt-3 h-0.5 rounded-full bg-white/10">
-            <div className="h-full w-[68%] rounded-full bg-white/60" />
-          </div> */}
+        <div>
+          <p className="text-[12px] font-medium">AI Interviewer</p>
+          <p className="text-[10px] text-white/30">
+            Do not refresh page during interview ⚠️
+          </p>
         </div>
       </div>
+
+      {/* Audio */}
+      <div className="flex items-center gap-0.75">
+        <span className="h-2 w-0.5 animate-pulse bg-white/30" />
+        <span className="h-4 w-0.5 animate-pulse bg-white/60" />
+        <span className="h-2 w-0.5 animate-pulse bg-white/30" />
+        <span className="h-3 w-0.5 animate-pulse bg-white/50" />
+      </div>
+    </div>
+
+    {/* Question / Skeleton */}
+    <div className="rounded-xl px-4 shrink-0">
+      {!message ? (
+        <div className="py-1">
+          <div className="h-3.5 w-[85%] rounded-md animate-shimmer" />
+          <div className="mt-2 h-3.5 w-[65%] rounded-md animate-shimmer" />
+        </div>
+      ) : (
+        <InterviewerMessage
+          key={message}
+          text={message}
+        />
+      )}
+    </div>
+  </div>
+</div>
+
+
     </section>
   );
 };

@@ -53,24 +53,21 @@
 //   const selectedVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
 //   const [introAnswer, setIntroAnswer] = useState("");
 //   const [speechPosition, setSpeechPosition] = useState<number | undefined>(undefined);
-//   const [transition, setTransition] = useState<"intro" | "next" | "complete" | null>(null);
+//   const [transition, setTransition] = useState<"intro" | "complete" | null>(null);
 //   const [speechComplete, setSpeechComplete] = useState(false);
 //   const IntroPrompt = "Hello! Welcome to your mock interview session. I'm your AI interviewer today, and I'll be guiding you through a few questions related to your role. Before we dive into the questions, please introduce yourself — your background and experience.";
 //   const IntroTransitionMessage = "Thank you for introducing yourself. Let's start with your first question.";
-//   const NextQuestionMessage = "Thank you. Here is your next question.";
 //   const CompleteMessage = "Thank you for your time and for answering all the questions. That concludes your interview. Your responses are now being evaluated. Please wait a moment while we prepare your performance.";
 //  const currentSpokenText =
 //   transition === "intro"
 //     ? IntroTransitionMessage
-//     : transition === "next"
-//       ? NextQuestionMessage
-//       : transition === "complete"
-//         ? CompleteMessage
-//         : phase === "intro"
-//           ? IntroPrompt
-//           : phase === "question"
-//             ? questions[questionIndex]?.question
-//             : followUp;
+//     : transition === "complete"
+//       ? CompleteMessage
+//       : phase === "intro"
+//         ? IntroPrompt
+//         : phase === "question"
+//           ? questions[questionIndex]?.question
+//           : followUp;
 
 //   useEffect(() => {
 //     const loadVoices = () => {
@@ -151,10 +148,7 @@
 //       videoRef.current.currentTime = 0;
 //     }
 
-//    if (
-//   text === IntroTransitionMessage ||
-//   text === NextQuestionMessage
-// ) {
+//    if (text === IntroTransitionMessage) {
 //   setTransition(null);
 // }
 //   };
@@ -204,11 +198,6 @@
 // useEffect(() => {
 //   if (transition === "intro") {
 //     speak(IntroTransitionMessage);
-//     return;
-//   }
-
-//   if (transition === "next") {
-//     speak(NextQuestionMessage);
 //     return;
 //   }
 
@@ -749,7 +738,7 @@ import { useInterviewStore } from "../store/useInterviewStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { useInterviewQuestions } from "../Components/Interview Re-design components/hooks/useInterviewQuestions";
 import { useInterviewFlow } from "../Components/Interview Re-design components/hooks/useInterviewFlow";
-import { useSpeechSynthesis } from "../Components/Interview Re-design components/hooks/useSpeechSynthesis";
+// import { useSpeechSynthesis } from "../Components/Interview Re-design components/hooks/useSpeechSynthesis";
 import { useVoiceRecording } from "../Components/Interview Re-design components/hooks/useVoiceRecording";
 import EvaluationOverlay from "../Components/Interview Re-design components/EvaluationOverlay";
 import InterviewHeader from "../Components/Interview Re-design components/InterviewHeader";
@@ -760,8 +749,9 @@ import InterviewControls from "../Components/Interview Re-design components/Inte
 import FailedUI from "../Components/Interview Re-design components/FailedUI";
 import InterviewNavigationGuard from "../Components/Interview Re-design components/InterviewNavigationGuard";
 import InterviewReloadGuard from "../Components/Interview Re-design components/InterviewReloadGuard";
+import { useTextToSpeech } from "../Components/Interview Re-design components/hooks/useTextToSpeech";
 
-const InterviewStaticPreview = () => {
+const Interview = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const { config } = useInterviewStore();
@@ -794,11 +784,11 @@ const InterviewStaticPreview = () => {
     questions,
   });
 
-  const { speechPosition, speechComplete } = useSpeechSynthesis({
+  const { audioReady } = useTextToSpeech({
     text: currentSpokenText,
     videoRef,
     onSpeechComplete: handleSpeechComplete,
-    loading
+    loading,
   });
 
   /*
@@ -809,39 +799,12 @@ const InterviewStaticPreview = () => {
     showToast,
   });
 
-  /*
-   * When the transition speech finishes,
-   * remove the transition so currentSpokenText
-   * becomes the actual question.
-   *
-   * Example:
-   *
-   * "Thank you. Here is your next question."
-   *          ↓ speechComplete
-   * transition = null
-   *          ↓
-   * actual question
-   *          ↓
-   * speech hook speaks question
-   */
-
   const currentAnswer =
     phase === "intro"
       ? introAnswer
       : phase === "question"
         ? answer
         : followUpAnswer;
-
-  /*
-   * Keep these guards in this order:
-   *
-   * 1. Questions error
-   * 2. Loading
-   * 3. Empty questions
-   *
-   * This prevents the empty state from appearing
-   * while questions are still being generated.
-   */
 
   if (questionsError) {
     return <FailedUI onRetry={retry} />;
@@ -863,7 +826,7 @@ const InterviewStaticPreview = () => {
     <>
       <InterviewNavigationGuard />
 
-    <InterviewReloadGuard />
+      <InterviewReloadGuard />
 
       <div className="relative min-h-screen bg-[#070707] text-white lg:pb-0">
         <EvaluationOverlay visible={isEvaluating} />
@@ -872,16 +835,13 @@ const InterviewStaticPreview = () => {
         <main className="mx-auto flex max-w-360 flex-col gap-4 p-3 pb-24 sm:p-5 sm:pb-28 lg:h-[calc(100vh-65px)] lg:flex-row lg:gap-5 lg:pb-5">
           <InterviewSidebar
             videoRef={videoRef}
-            message={currentSpokenText}
-            speechPosition={speechPosition}
-            speechComplete={speechComplete}
+            message={audioReady ? currentSpokenText : ""}
             questionIndex={questionIndex}
             totalQuestions={questions.length}
             phase={phase}
           />
-
           <section className="flex w-full flex-col gap-4 lg:w-100 lg:shrink-0">
-            {phase !== "intro" && currentQuestion && (
+            {phase !== "intro" && currentQuestion && audioReady && (
               <InterviewQuestion
                 questionIndex={questionIndex}
                 totalQuestions={questions.length}
@@ -889,6 +849,20 @@ const InterviewStaticPreview = () => {
                 question={phase === "question" ? currentQuestion : followUp}
               />
             )}
+
+           {phase !== "intro" && currentQuestion && !audioReady && (
+  <div className="rounded-xl border border-white/10 bg-white/3 p-4">
+    <div className="mb-2 flex items-center justify-between">
+      <div className="h-2.5 w-24 rounded bg-white/10 animate-pulse" />
+
+      <div className="h-5 w-24 rounded-full bg-white/10 animate-pulse" />
+    </div>
+
+    <div className="h-5 w-3/4 rounded bg-white/10 animate-pulse" />
+  </div>
+)}
+
+
             <InterviewAnswer
               value={currentAnswer}
               isRecording={isRecording}
@@ -931,4 +905,4 @@ const InterviewStaticPreview = () => {
   );
 };
 
-export default InterviewStaticPreview;
+export default Interview;

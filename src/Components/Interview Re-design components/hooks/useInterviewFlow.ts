@@ -90,15 +90,13 @@ export const useInterviewFlow = ({
   const currentSpokenText =
     transition === "intro"
       ? "Thank you for introducing yourself. Let's start with your first question."
-      : transition === "next"
-        ? "Thank you. Here is your next question."
-        : transition === "complete"
-          ? "Thank you for your time and for answering all the questions. That concludes your interview. Your responses are now being evaluated. Please wait a moment while we prepare your performance."
-          : phase === "intro"
-            ? "Hello! Welcome to your mock interview session. I'm your AI interviewer today, and I'll be guiding you through a few questions related to your role. Before we dive into the questions, please introduce yourself — your background and experience."
-            : phase === "question"
-              ? currentQuestion
-              : followUp;
+      : transition === "complete"
+        ? "Thank you for your time and for answering all the questions. That concludes your interview. Your responses are now being evaluated. Please wait a moment while we prepare your performance."
+        : phase === "intro"
+          ? "Hello! Welcome to your mock interview session. I'm your AI interviewer today, and I'll be guiding you through a few questions related to your role. Before we dive into the questions, please introduce yourself — your background and experience."
+          : phase === "question"
+            ? currentQuestion
+            : followUp;
 
   /*
    * Called by useSpeechSynthesis ONLY after
@@ -112,17 +110,6 @@ export const useInterviewFlow = ({
        * actual question phase.
        */
       if (transition === "intro") {
-        setTransition(null);
-        setPhase("question");
-        return;
-      }
-
-      /*
-       * Next-question transition finished.
-       *
-       * NOW move to the next actual question.
-       */
-      if (transition === "next") {
         setTransition(null);
         setPhase("question");
         return;
@@ -152,7 +139,7 @@ const moveToNextQuestion = useCallback(() => {
   setTranscribedFollowUpAnswer("")
   setQuestionIndex((previous) => previous + 1)
   setPhase("question")
-  setTransition("next")
+  setTransition(null)
   setIsSubmitDisabled(false)
 }, []) // ← empty array — sirf setters hain jo stable hain
 

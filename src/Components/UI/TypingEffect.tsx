@@ -60,7 +60,7 @@ function TypingText({
 
 export function TypingEffect({
   text,
-  speed = 50,
+  speed = 75,
   cursor,
   className = "",
   onComplete,
