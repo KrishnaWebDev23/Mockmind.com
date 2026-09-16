@@ -1,52 +1,46 @@
-import { EdgeTTS } from "npm:edge-tts-universal@1.4.0";
+// supabase/functions/text-to-speech/index.ts
+import { createClient } from "https://esm.sh";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
     const { text, voice } = await req.json();
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
-    if (!text || typeof text !== "string") {
-      return new Response(JSON.stringify({ error: "text is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const tts = new EdgeTTS(text, voice || "en-US-GuyNeural", {
-      rate: "+0%",
-      volume: "+0%",
-      pitch: "+0Hz",
+    // 1. Fetch audio via a standard HTTP POST (Supported by Supabase)
+    const response = await fetch("https://openai.com", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "tts-1",
+        input: text,
+        voice: voice || "alloy",
+      }),
     });
 
-    const result = await tts.synthesize();
-    const audioArrayBuffer = await result.audio.arrayBuffer();
-    const audioBytes = new Uint8Array(audioArrayBuffer);
+    if (!response.ok) throw new Error("OpenAI API failed");
 
-    let binary = "";
-    for (let i = 0; i < audioBytes.length; i++) {
-      binary += String.fromCharCode(audioBytes[i]);
-    }
-    const base64Audio = btoa(binary);
+    // 2. Convert and send base64 back safely
+    const audioBuffer = await response.arrayBuffer();
+    const audioBytes = new Uint8Array(audioBuffer);
+    const base64Audio = btoa(String.fromCodePoint(...audioBytes));
 
     return new Response(JSON.stringify({ audio: base64Audio }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("TTS Error:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), { 
+      status: 500, 
+      headers: corsHeaders 
+    });
   }
 });

@@ -6,7 +6,7 @@ import LandingPage from '../Components/HomePage/LandingPage'
 import { useRef } from 'react'
 
 const HomePage = () => {
-   const aboutRef = useRef<HTMLDivElement>(null)
+  const aboutRef = useRef<HTMLDivElement>(null)
 
   const scrollToAbout = () => {
     aboutRef.current?.scrollIntoView({ behavior: 'smooth' })
