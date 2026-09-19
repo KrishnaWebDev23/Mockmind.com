@@ -30,6 +30,6 @@ export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
     file: file,
     model: "whisper-large-v3",
   })
-
+  
   return transcription.text
 }
