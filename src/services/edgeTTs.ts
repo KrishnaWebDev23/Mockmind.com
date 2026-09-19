@@ -3,8 +3,7 @@ export const textToSpeech = async (
   text: string,
   voice = "en-GB-RyanNeural"
 ): Promise<string> => {
-  // 🚀 Redirecting from Supabase to your local Express server on port 3000
-  const response = await fetch("http://localhost:3000/api/tts", {
+  const response = await fetch("/api/tts", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
