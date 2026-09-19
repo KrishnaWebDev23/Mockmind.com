@@ -9,58 +9,19 @@ export const getFollowUp = async (
   question: string,
   answer: string
 ): Promise<string> => {
-  try {
-    const completion = await groq.chat.completions.create({
-      model: "qwen/qwen3.6-27b",
-      reasoning_effort: "none",
-      max_tokens: 300,
+  const response = await fetch("/api/follow-up", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question, answer }),
+  });
 
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an expert technical interviewer. Your job is to ask one short, relevant follow-up question based on the candidate's answer.",
-        },
-        {
-          role: "user",
-          content: `
-Original interview question:
-"${question}"
+  const data = await response.json().catch(() => ({}));
 
-Candidate's answer:
-"${answer}"
-
-Instructions:
-- Ask exactly ONE follow-up question.
-- The follow-up must be relevant to the original question and the candidate's answer.
-- Keep it short and natural.
-- If the candidate's answer is incorrect or answers a different topic, ask a question that helps clarify the misunderstanding.
-- Do not answer the question yourself.
-- Do not explain anything.
-- Do not include numbering.
-- Return ONLY the follow-up question.
-          `,
-        },
-      ],
-    });
-
-    const message = completion.choices?.[0]?.message;
-
-   const followUp = (message?.content || "")
-  .replace(/[`'";]/g, "")
-  .replace(/\s+/g, " ")
-  .trim();
-
-    if (!followUp) {
-      console.warn("Groq returned an empty follow-up question.");
-      return "";
-    }
-
-    return followUp;
-  } catch (error) {
-    console.error("FAILED TO GENERATE FOLLOW-UP:", error);
-    throw error;
+  if (!response.ok || !data.followUp) {
+    throw new Error(data.error || "Failed to generate follow-up question");
   }
+
+  return data.followUp;
 };
 
 export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
