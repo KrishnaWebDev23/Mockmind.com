@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { EdgeTTS } from 'edge-tts-universal';
 import Groq from 'groq-sdk';
+import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
 
 const app = express();
 app.use(cors());
@@ -12,17 +12,55 @@ const groq = new Groq({
 });
 
 app.post('/api/tts', async (req, res) => {
-  try {
-    const { text, voice } = req.body;
+  const { text, voice = 'en-GB-RyanNeural' } = req.body ?? {};
 
-    const tts = new EdgeTTS(text, voice || 'en-US-GuyNeural');
-    const result = await tts.synthesize();
-    const arrayBuffer = await result.audio.arrayBuffer();
-    
-    const base64Audio = Buffer.from(arrayBuffer).toString('base64');
-    return res.json({ audio: base64Audio });
+  if (typeof text !== 'string' || !text.trim()) {
+    return res.status(400).json({ error: 'Text is required' });
+  }
+  if (typeof voice !== 'string' || !voice.trim()) {
+    return res.status(400).json({ error: 'Voice must be a non-empty string' });
+  }
+
+  const tts = new MsEdgeTTS();
+
+  try {
+    await tts.setMetadata(
+      voice,
+      OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3,
+    );
+
+    const { audioStream } = tts.toStream(
+      text.trim().replace(/[<>&'"]/g, (character) => ({
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        "'": '&apos;',
+        '"': '&quot;',
+      })[character]),
+    );
+
+    const closeTts = () => tts.close();
+    audioStream.once('close', closeTts);
+    audioStream.once('error', (error) => {
+      console.error('Failed to generate TTS audio:', error);
+      closeTts();
+      if (res.headersSent) {
+        res.destroy();
+      } else {
+        res.status(502).json({ error: 'Failed to generate speech' });
+      }
+    });
+    res.once('close', () => {
+      if (!audioStream.destroyed) audioStream.destroy();
+      closeTts();
+    });
+
+    res.setHeader('Content-Type', 'audio/mpeg');
+    audioStream.pipe(res);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    tts.close();
+    console.error('Failed to initialize TTS:', error);
+    return res.status(502).json({ error: 'Failed to generate speech' });
   }
 });
 
@@ -66,4 +104,4 @@ app.post('/api/follow-up', async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log('🚀 TTS Backend ready on port 3000'));
+app.listen(8000, () => console.log('🚀 API server ready on http://localhost:8000'));

@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { TypingEffect } from "../UI/TypingEffect";
 
 type InterviewerMessageProps = {
   text: string;
@@ -20,7 +19,7 @@ export const InterviewerMessage = ({ text }: InterviewerMessageProps) => {
       ref={containerRef}
       className="sm:h-10 h-8 overflow-hidden text-xs sm:text-sm leading-4 sm:leading-5 text-zinc-300 animate-in fade-in duration-300"
     >
-      <TypingEffect text={text} />
+      {text}
     </div>
   );
 };

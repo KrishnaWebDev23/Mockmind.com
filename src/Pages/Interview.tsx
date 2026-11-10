@@ -733,7 +733,7 @@
 
 // export default Interview;
 
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { useInterviewStore } from "../store/useInterviewStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { useInterviewQuestions } from "../Components/Interview Re-design components/hooks/useInterviewQuestions";
@@ -756,6 +756,9 @@ const Interview = () => {
 
   const { config } = useInterviewStore();
   const { showToast } = useAuthStore();
+  const handleSpeechError = useCallback((message: string) => {
+    showToast(message, "error");
+  }, [showToast]);
 
   const { questions, loading, questionsError, retry } = useInterviewQuestions();
 
@@ -784,10 +787,11 @@ const Interview = () => {
     questions,
   });
 
-  const { audioReady } = useTextToSpeech({
+  const { needsUserGesture, resumeSpeech } = useTextToSpeech({
     text: currentSpokenText,
     videoRef,
     onSpeechComplete: handleSpeechComplete,
+    onSpeechError: handleSpeechError,
     loading,
   });
 
@@ -835,13 +839,15 @@ const Interview = () => {
         <main className="mx-auto flex max-w-360 flex-col gap-4 p-3 pb-24 sm:p-5 sm:pb-28 lg:h-[calc(100vh-65px)] lg:flex-row lg:gap-5 lg:pb-5">
           <InterviewSidebar
             videoRef={videoRef}
-            message={audioReady ? currentSpokenText : ""}
+            message={currentSpokenText}
             questionIndex={questionIndex}
             totalQuestions={questions.length}
             phase={phase}
+            needsUserGesture={needsUserGesture}
+            onResumeSpeech={resumeSpeech}
           />
           <section className="flex w-full flex-col gap-4 lg:w-100 lg:shrink-0">
-            {phase !== "intro" && currentQuestion && audioReady && (
+            {phase !== "intro" && currentQuestion && (
               <InterviewQuestion
                 questionIndex={questionIndex}
                 totalQuestions={questions.length}
@@ -849,19 +855,6 @@ const Interview = () => {
                 question={phase === "question" ? currentQuestion : followUp}
               />
             )}
-
-           {phase !== "intro" && currentQuestion && !audioReady && (
-  <div className="rounded-xl border border-white/10 bg-white/3 p-4">
-    <div className="mb-2 flex items-center justify-between">
-      <div className="h-2.5 w-24 rounded bg-white/10 animate-pulse" />
-
-      <div className="h-5 w-24 rounded-full bg-white/10 animate-pulse" />
-    </div>
-
-    <div className="h-5 w-3/4 rounded bg-white/10 animate-pulse" />
-  </div>
-)}
-
 
             <InterviewAnswer
               value={currentAnswer}

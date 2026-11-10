@@ -9,6 +9,8 @@ type InterviewSidebarProps = {
   questionIndex: number;
   totalQuestions: number;
   phase: InterviewPhase;
+  needsUserGesture: boolean;
+  onResumeSpeech: () => void;
 };
 
 const InterviewSidebar = ({
@@ -17,6 +19,8 @@ const InterviewSidebar = ({
   questionIndex,
   totalQuestions,
   phase,
+  needsUserGesture,
+  onResumeSpeech,
 }: InterviewSidebarProps) => {
 
    const questionNumber =
@@ -42,6 +46,18 @@ const InterviewSidebar = ({
 
         <div className="pointer-events-none absolute inset-0 bg-black/25" />
       </div>
+
+      {needsUserGesture && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 px-4">
+          <button
+            type="button"
+            onClick={onResumeSpeech}
+            className="rounded-xl border border-white/20 bg-black/80 px-5 py-3 text-sm font-medium text-white shadow-xl backdrop-blur transition hover:bg-black"
+          >
+            Tap to play interviewer voice
+          </button>
+        </div>
+      )}
 
       {/* Interviewer Status */}
       <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
